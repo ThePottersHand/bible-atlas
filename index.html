@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Land Bears Witness — an atlas of Scripture</title>
+<meta name="description" content="An interactive relief atlas of the Bible: every era, every journey, laid on the real land. Historically careful, Christ-centred.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app"></div>
+<div id="labels"></div>
+<svg id="leader" xmlns="http://www.w3.org/2000/svg"><path d=""/></svg>
+
+<header id="top">
+  <div class="brand"><h1>The Land Bears Witness</h1><small>An atlas of Scripture</small></div>
+  <div id="search"><input id="q" type="search" placeholder="Find a place…  ( / )" autocomplete="off" spellcheck="false"><ul id="search-results"></ul></div>
+  <nav class="tools">
+    <button id="btn-threads" class="tb" title="Threads: journeys laid on the land (T)">Threads</button>
+    <button id="btn-layers" class="tb" title="Layers (L)">Layers</button>
+    <button id="btn-light" class="tb icon" title="Light: time of day">☼</button>
+    <button id="btn-measure" class="tb icon" title="Measuring cord (M)">⟷</button>
+    <button id="btn-sound" class="tb icon" title="Sound on / off">♪</button>
+    <button id="btn-help" class="tb icon" title="Help &amp; notes on the map (?)">?</button>
+    <button id="btn-home" class="tb icon" title="Return to the Land (H)">⌂</button>
+  </nav>
+</header>
+
+<div id="banner"></div>
+
+<aside id="panel-threads" class="panel left">
+  <h2>Threads</h2>
+  <p class="lead">Journeys laid on the land like thread. Choose one and the cord unspools, stop by stop, with the camera following. The <b>Scarlet Thread</b> follows the line of promise from Eden to the ends of the earth.</p>
+  <div id="threads-list"></div>
+</aside>
+
+<aside id="panel-layers" class="panel right">
+  <h2>Layers</h2>
+  <div class="field"><label for="lay-regions">Boundaries</label><select id="lay-regions"></select></div>
+  <div class="field"><label for="lay-rivers">Rivers</label><input type="checkbox" id="lay-rivers" checked></div>
+  <div class="field"><label for="lay-proph">Prophecy &amp; fulfilment pins</label><input type="checkbox" id="lay-proph"></div>
+  <div class="field"><label for="lay-density">Label density</label><input type="range" id="lay-density" min="0.5" max="2.2" step="0.1" value="1"></div>
+  <div class="field"><label for="lay-exag">Relief exaggeration</label><input type="range" id="lay-exag" min="1" max="5" step="0.25" value="3"></div>
+  <p class="note">Boundaries are painted soft-edged on purpose. Scripture gives borders as lists of towns and landmarks, not surveyed lines, and every polygon here is an approximation. Places outside the chosen era are shown faded. Relief is exaggerated three times by default, as on a museum model; “Stand here” drops it to true scale.</p>
+</aside>
+
+<div id="pop-light" class="pop">
+  <h4>Light on the land</h4>
+  <div class="val">The era’s own light</div>
+  <input type="range" id="hour" min="4" max="20.5" step="0.25" value="12">
+  <button id="hour-reset">Return to the era’s light</button>
+</div>
+
+<section id="stele" class="stele"><button class="close" title="Close">×</button><div class="body"></div></section>
+
+<div id="narration">
+  <div class="row">
+    <div style="flex:1;min-width:0"><div id="narr-title"></div><div id="narr-sub"></div></div>
+    <div class="ctl">
+      <button id="narr-prev" title="Previous stop (P)">‹</button>
+      <button id="narr-play" title="Play">▶</button>
+      <button id="narr-next" title="Next stop (N)">›</button>
+      <span id="narr-stop"></span>
+      <button id="narr-close" title="Put the thread away">×</button>
+    </div>
+  </div>
+  <div id="narr-bar"><span></span></div>
+  <div id="narr-dots"></div>
+</div>
+
+<div id="standbar"><span id="stand-title"></span><span id="stand-compass"></span><button id="stand-exit">Rise</button></div>
+
+<footer id="scroll">
+  <div class="roll l"></div>
+  <div class="sheet"><div id="eras"></div><div id="books"></div></div>
+  <div class="roll r"></div>
+</footer>
+
+<div id="hud"></div>
+<div id="toast"></div>
+
+<div id="help" class="modal">
+  <div class="sheet">
+    <button class="close" title="Close">×</button>
+    <h2>The Land Bears Witness</h2>
+    <p>A relief atlas of the Bible. Real elevation data is sculpted into a model of the biblical world, from Rome to Ur and from Egypt to Ararat, and lit differently for each era of the story. Nothing modern is drawn: no roads, no borders, no present-day cities. Only the land, its waters, and what Scripture names.</p>
+    <p>“Remember the days of old; consider the years of many generations.” <em>Deuteronomy 32:7</em></p>
+
+    <h3>How to use it</h3>
+    <ul>
+      <li><b>Drag</b> to pan, <b>right-drag</b> to tilt and turn, <b>scroll</b> to zoom toward the cursor, <b>double-click</b> to dive in.</li>
+      <li><b>Click a place</b> to raise its stele: Scripture, history, how sure we are of the site, and what it points to.</li>
+      <li><b>The Scroll</b> along the bottom moves you through the eras. The light on the land changes with each one, and so do the boundaries and the places that matter.</li>
+      <li><b>Threads</b> lays journeys on the land. Press play and the cord unspools while the camera follows. Click the numbered stops to jump.</li>
+      <li><b>Stand here</b> drops you to eye level at a site at true scale. Drag to look around. Moses on Nebo, Elijah on Carmel, Jesus on the Mount of Olives.</li>
+      <li><b>Layers</b> chooses which boundaries to paint, turns on prophecy pins and rivers, and sets relief exaggeration.</li>
+      <li><b>The measuring cord</b> gives the distance between any two points and how many days it would take on foot.</li>
+    </ul>
+    <ul class="keys">
+      <li><kbd>/</kbd> search</li><li><kbd>[</kbd> <kbd>]</kbd> previous / next era</li><li><kbd>T</kbd> threads</li><li><kbd>L</kbd> layers</li>
+      <li><kbd>Space</kbd> play / pause a thread</li><li><kbd>N</kbd> <kbd>P</kbd> next / previous stop</li><li><kbd>S</kbd> stand at the selected place</li><li><kbd>M</kbd> measuring cord</li>
+      <li><kbd>H</kbd> home</li><li><kbd>Esc</kbd> close / rise / deselect</li>
+    </ul>
+
+    <h3>Notes on the map: how we handled uncertainty</h3>
+    <ul>
+      <li><b>Site confidence.</b> Every place carries a grade: <i>certain</i>, <i>probable</i>, <i>traditional</i>, <i>disputed</i> or <i>unknown</i>. Where scholars disagree (Mount Sinai, Ai, Sodom, Emmaus, the Red Sea crossing, Bethany beyond the Jordan, Kadesh-barnea) the stele lists the other proposed locations and lets you fly to them. A small <b>?</b> on a label marks a disputed or unknown site.</li>
+      <li><b>Boundaries</b> are approximate by nature and drawn soft-edged. Empires in particular are zones of control, not surveyed borders; the desert edges are arbitrary.</li>
+      <li><b>Dates</b> follow the traditional (early) chronology: the Exodus in 1446 BC after 1 Kings 6:1, the conquest from about 1406 BC, and Jesus’ crucifixion in AD 33 (AD 30 is also widely held). Where the thirteenth-century Exodus date affects a site, the notes say so.</li>
+      <li><b>Water.</b> The Dead Sea is drawn at about its biblical level (roughly 395 m below sea level), so its southern basin is water, as it was in antiquity and is not today. The Sea of Galilee stands at 205 m below. Modern reservoirs are not drawn. Coastlines are modern; changes since antiquity (the silting of Ephesus and Miletus, Tyre’s causeway) are noted on the relevant steles.</li>
+      <li><b>Rivers</b> are sketched by hand at coarse resolution. The Nile’s extinct Pelusiac branch is drawn because it mattered for Goshen and the route to Sinai.</li>
+      <li><b>Relief</b> is exaggerated three times by default so that the land reads like a museum model. “Stand here” and the Layers slider give true scale.</li>
+      <li><b>Journey routes</b> between named stops are reconstructions along plausible roads and sea lanes, not revealed itineraries.</li>
+      <li><b>Scripture quotations</b> are from the ESV® Bible (The Holy Bible, English Standard Version®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.</li>
+    </ul>
+
+    <h3>Sources</h3>
+    <ul>
+      <li>Elevation: AWS Terrain Tiles (SRTM, GMTED2010, ETOPO1), public domain, processed by <code>tools/build_terrain.py</code>.</li>
+      <li>Place coordinates and identifications draw on the standard reference works and open gazetteers (OpenBible.info Bible Geocoding, Tyndale House STEPBible place data, the Pleiades gazetteer, published excavation reports).</li>
+      <li>Built with three.js. No tracking, no accounts, nothing is sent anywhere.</li>
+    </ul>
+    <p style="margin-top:20px">Companion piece: <a href="https://thepottershand.github.io/tabernacle-3d/" target="_blank" rel="noopener">The Tabernacle: A 3D Journey</a>.</p>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="inner">
+    <div class="kicker">An atlas of Scripture</div>
+    <h1>The Land Bears Witness<span>From Ur to Rome · Every era · Every journey</span></h1>
+    <p class="verse">“For the LORD your God is bringing you into a good land, a land of brooks of water, of fountains and springs, flowing out in the valleys and hills.”<cite>Deuteronomy 8:7</cite></p>
+    <div class="bar"><span></span></div>
+    <div class="msg">Raising the land…</div>
+    <button class="enter">Enter the Land</button>
+    <div class="fine">Real elevation data · nothing modern drawn · sound is optional</div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="js/data/eras.js"></script>
+<script src="js/data/places.js"></script>
+<script src="js/data/journeys.js"></script>
+<script src="js/data/regions.js"></script>
+<script src="js/data/prophecies.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/terrain.js"></script>
+<script src="js/labels.js"></script>
+<script src="js/threads.js"></script>
+<script src="js/overlay.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

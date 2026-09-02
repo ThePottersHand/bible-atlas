@@ -1,0 +1,50 @@
+{
+ "world": {
+  "z": 7,
+  "x0": 67,
+  "y0": 45,
+  "nx": 15,
+  "ny": 10,
+  "width": 3840,
+  "height": 2560,
+  "lon0": 8.4375,
+  "lon1": 50.625,
+  "lat1": 47.04018214480666,
+  "lat0": 24.527134822597795,
+  "hmin": -5147.0,
+  "hmax": 5483.0
+ },
+ "levant": {
+  "z": 9,
+  "x0": 302,
+  "y0": 204,
+  "nx": 8,
+  "ny": 12,
+  "width": 2048,
+  "height": 3072,
+  "lon0": 32.34375,
+  "lon1": 37.96875,
+  "lat1": 34.30714385628804,
+  "lat0": 27.05912578437406,
+  "hmin": -2751.3359375,
+  "hmax": 3078.0
+ },
+ "jerusalem": {
+  "z": 12,
+  "x0": 2447,
+  "y0": 1665,
+  "nx": 3,
+  "ny": 3,
+  "width": 768,
+  "height": 768,
+  "lon0": 35.068359375,
+  "lon1": 35.33203125,
+  "lat1": 31.877557643340023,
+  "lat0": 31.653381399663985,
+  "hmin": 148.0,
+  "hmax": 996.0
+ },
+ "encoding": "terrarium",
+ "source": "AWS Terrain Tiles (SRTM / GMTED2010 / ETOPO1), public domain",
+ "notes": "Dead Sea filled to c. -395 m (ancient level). Sea of Galilee -205 m. Modern reservoirs are not water."
+}
