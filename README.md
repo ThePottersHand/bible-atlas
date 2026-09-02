@@ -6,7 +6,9 @@ Companion to [The Tabernacle: A 3D Journey](https://thepottershand.github.io/tab
 
 ## Run it
 
-The heightmaps are PNG textures, and browsers refuse to read image data from `file://` pages, so the folder must be served over http:
+**Live site:** https://thepottershand.github.io/bible-atlas/
+
+Or locally: The heightmaps are PNG textures, and browsers refuse to read image data from `file://` pages, so the folder must be served over http:
 
 ```
 python serve.py          # or double-click serve.cmd
