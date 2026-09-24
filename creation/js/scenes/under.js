@@ -35,19 +35,18 @@ float whale(vec2 p){
   vec2 w = p - uWhale.xz;
   float c = cos(uWhaleAng), s = sin(uWhaleAng);
   w = vec2(c*w.x + s*w.y, -s*w.x + c*w.y)/uWhaleLen;
-  w.y *= 0.6;                                   // seen from below at a slant: widen so the fins still read
+  w.y *= 0.55;                                  // seen from below at a slant: widen so the fins still read
   float sway = 0.02*sin(uTime*1.3 - w.x*4.0);
   w.y += sway*(0.5 - w.x);
-  vec2 e = w - vec2(0.1, 0.0);
-  float body = (length(e/vec2(0.36, 0.11)) - 1.0)*0.1;
-  body = min(body, segSDF(w, vec2(-0.05, 0.0), vec2(-0.42, 0.0), 0.095, 0.02));
-  float fl = 0.12 + 0.02*sin(uTime*1.3);
-  body = min(body, segSDF(w, vec2(-0.42, 0.0), vec2(-0.53, fl), 0.028, 0.006));
-  body = min(body, segSDF(w, vec2(-0.42, 0.0), vec2(-0.53, -fl), 0.028, 0.006));
-  float spread = 0.36 + 0.03*sin(uFin);
-  vec2 elbow = vec2(0.06, 0.2);
-  body = min(body, min(segSDF(w, vec2(0.16, 0.07), vec2(0.06, 0.2), 0.045, 0.036), segSDF(w, vec2(0.06, 0.2), vec2(-0.08, spread), 0.036, 0.01)));
-  body = min(body, min(segSDF(w, vec2(0.16, -0.07), vec2(0.06, -0.2), 0.045, 0.036), segSDF(w, vec2(0.06, -0.2), vec2(-0.08, -spread), 0.036, 0.01)));
+  vec2 e = w - vec2(0.12, 0.0);
+  float body = (length(e/vec2(0.34, 0.12)) - 1.0)*0.11;
+  body = min(body, segSDF(w, vec2(-0.02, 0.0), vec2(-0.38, 0.0), 0.10, 0.022));
+  float fl = 0.16 + 0.02*sin(uTime*1.3);
+  body = min(body, segSDF(w, vec2(-0.37, 0.0), vec2(-0.47, fl), 0.035, 0.008));
+  body = min(body, segSDF(w, vec2(-0.37, 0.0), vec2(-0.47, -fl), 0.035, 0.008));
+  float spread = 0.44 + 0.03*sin(uFin);
+  body = min(body, min(segSDF(w, vec2(0.17, 0.08), vec2(0.05, 0.24), 0.05, 0.04), segSDF(w, vec2(0.05, 0.24), vec2(-0.12, spread), 0.04, 0.012)));
+  body = min(body, min(segSDF(w, vec2(0.17, -0.08), vec2(0.05, -0.24), 0.05, 0.04), segSDF(w, vec2(0.05, -0.24), vec2(-0.12, -spread), 0.04, 0.012)));
   return body*uWhaleLen;
 }
 

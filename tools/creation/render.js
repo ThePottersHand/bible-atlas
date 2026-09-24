@@ -2,7 +2,7 @@
    Export "In the Beginning" frame by frame with headless Chromium.
 
      node tools/creation/render.js stills 0.5 11 23.8 [--w 960] [--out dir]
-     node tools/creation/render.js film [--fps 30] [--w 1920] [--from 0] [--to 72] [--out creation/in-the-beginning.mp4]
+     node tools/creation/render.js film [--fps 30] [--w 1920] [--from 0] [--to 72] [--out master.mp4] [--web creation/in-the-beginning.mp4]
 
    Needs Playwright (npm i -g playwright, or NODE_PATH pointing at it) and an
    ffmpeg with libx264 on PATH or in FFMPEG. Without a GPU, Chromium falls back
@@ -71,39 +71,49 @@ async function stills(times) {
   s.srv.close();
 }
 
+/* one encoder: frames arrive as PNG on stdin; audio is trimmed to the same span */
+function encoder(ffmpeg, fps, audio, from, to, out, v, a) {
+  const args = ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-i', '-'];
+  if (audio) args.push('-ss', String(from), '-t', String(to - from), '-i', audio);
+  args.push('-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart',
+    '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', ...v);
+  if (audio) args.push('-c:a', 'aac', ...a, '-shortest');
+  args.push(out);
+  return spawn(ffmpeg, args, { stdio: ['pipe', 'inherit', 'inherit'] });
+}
+
 async function film() {
   const width = +arg('w', 1920);
   const fps = +arg('fps', 30);
   const ffmpeg = process.env.FFMPEG || 'ffmpeg';
   const outFile = path.resolve(arg('out', path.join(ROOT, 'creation', 'in-the-beginning.mp4')));
+  const webFile = arg('web', null);
   const audio = arg('audio', path.join(ROOT, 'tools', 'cache', 'score.wav'));
   const s = await open(width);
   const from = +arg('from', 0), to = +arg('to', s.info.duration);
   const n0 = Math.round(from * fps), n1 = Math.round(to * fps);
-  const args = ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-i', '-'];
-  const withAudio = fs.existsSync(audio) && !process.argv.includes('--silent');
-  if (withAudio) args.push('-ss', String(from), '-t', String(to - from), '-i', audio);
-  args.push('-c:v', 'libx264', '-preset', arg('preset', 'slow'), '-crf', arg('crf', '17'), '-tune', 'grain', '-pix_fmt', 'yuv420p',
-    '-profile:v', 'high', '-movflags', '+faststart', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709');
-  if (withAudio) args.push('-c:a', 'aac', '-b:a', '256k', '-shortest');
-  args.push(outFile);
-  const ff = spawn(ffmpeg, args, { stdio: ['pipe', 'inherit', 'inherit'] });
+  const withAudio = fs.existsSync(audio) && !process.argv.includes('--silent') ? audio : null;
+  // the master, and optionally a lighter copy for the web page, fed from the same frames
+  const encs = [encoder(ffmpeg, fps, withAudio, from, to, outFile,
+    ['-preset', arg('preset', 'slow'), '-crf', arg('crf', '19'), '-tune', arg('tune', 'film')], ['-b:a', '256k'])];
+  if (webFile) encs.push(encoder(ffmpeg, fps, withAudio, from, to, path.resolve(webFile),
+    ['-preset', 'slow', '-crf', arg('webcrf', '25'), '-maxrate', '4500k', '-bufsize', '9000k', '-tune', 'film'], ['-b:a', '160k']));
   const started = Date.now();
   for (let n = n0; n < n1; n++) {
     const t = n / fps;
     await s.page.evaluate((tt) => window.FILM_CAPTURE.frame(tt), t);
     const png = await s.page.screenshot({ type: 'png' });
-    if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
+    for (const ff of encs) if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
     if ((n - n0) % 30 === 0) {
       const done = n - n0 + 1, left = (n1 - n) * (Date.now() - started) / done / 1000;
       console.log(`frame ${n}/${n1}  t=${t.toFixed(2)}s  ~${Math.round(left / 60)} min left`);
     }
   }
-  ff.stdin.end();
-  await new Promise((r) => ff.on('close', r));
+  for (const ff of encs) ff.stdin.end();
+  await Promise.all(encs.map((ff) => new Promise((r) => ff.on('close', r))));
   await s.browser.close();
   s.srv.close();
-  console.log('wrote', outFile);
+  console.log('wrote', outFile, webFile || '');
 }
 
 const mode = process.argv[2];

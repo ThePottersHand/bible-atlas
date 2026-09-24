@@ -128,6 +128,8 @@ FILM.scenes = FILM.scenes || {};
     var edge = Math.max(1 - U.sstep(0, 0.6, t), U.sstep(CUES.duration - 0.8, CUES.duration, t));
     post.fade = Math.max(post.fade || 0, edge);
     if (edge > (post.fadeWhite || 0)) post.fadeColor = [0, 0, 0];
+    // exported frames carry lighter grain: encoders spend their bits on noise
+    if (CAPTURE) post.grain = (post.grain != null ? post.grain : 0.03) * 0.5;
     post.time = t;
     post.frame = frameNo++;
     Post.run(T.main, post, canvas.width, canvas.height);
@@ -185,6 +187,7 @@ FILM.scenes = FILM.scenes || {};
     playing = false;
     if (audio) audio.pause();
     cancelAnimationFrame(raf);
+    document.body.classList.remove('playing');
     document.body.classList.add('paused');
     renderAt(tNow);
   }
@@ -253,7 +256,7 @@ FILM.scenes = FILM.scenes || {};
     return document.fonts.ready.then(function () {
       // compile everything up front by drawing a frame from each scene
       CUES.scenes.forEach(function (s) { if (FILM.scenes[s.id]) renderAt(s.t0 + 0.01); });
-      tNow = CAPTURE ? 0 : 11.6;
+      tNow = CAPTURE ? 0 : 7.2;          // behind the title: the Spirit over the dark waters
       renderAt(tNow);
       gl.finish();
     });

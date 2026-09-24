@@ -7,8 +7,8 @@ window.FILM = window.FILM || {};
 
 FILM.Text = (function () {
   var U = FILM.U, items = [], root = null;
-  var IN = { verse: 1.1, small: 0.9, said: 0.7, fiat: 0.9, day: 0.6, john: 1.3, title: 1.6, sub: 1.2 };
-  var OUT = { verse: 0.9, small: 0.8, said: 0.7, fiat: 0.8, day: 0.5, john: 1.0, title: 1.2, sub: 1.2 };
+  var IN = { verse: 0.8, small: 0.6, said: 0.5, fiat: 0.55, day: 0.5, john: 1.0, title: 1.4, sub: 1.0 };
+  var OUT = { verse: 0.6, small: 0.5, said: 0.5, fiat: 0.5, day: 0.45, john: 0.8, title: 1.0, sub: 1.0 };
 
   function init(el, cues) {
     root = el;

@@ -82,7 +82,7 @@ vec3 skyCol(vec3 rd){
 vec3 lightCore(vec3 rd){
   float mu = max(dot(rd, uLightDir), 0.0);
   float a = acos(min(mu, 1.0));
-  return uLightCol*uLightI*(60.0*exp(-a*a*6.0e5) + 3.0*exp(-a*a*2.0e4) + 0.10*exp(-a*a*900.0));
+  return uLightCol*uLightI*(60.0*exp(-a*a*6.0e5) + 3.0*exp(-a*a*2.0e4) + 0.05*exp(-a*a*900.0));
 }
 
 // The Spirit: a breath of light, wide like outspread wings, fluttering as it hovers.
@@ -118,12 +118,12 @@ vec3 wake(vec2 p){
   float sp = max(s, 0.0);
   float arm = abs(abs(c) - sp*0.55);
   float width = 0.18 + sp*0.05;
-  float g = exp(-arm*arm/(width*width))*exp(-sp*0.13);
+  float g = exp(-arm*arm/(width*width))*exp(-sp*0.22);
   float ripple = 0.5 + 0.5*sin(length(vec2(sp, c*1.6))*2.6 - uTime*2.4);
   float inside = sstep(0.0, 0.6, sp*0.55 - abs(c))*exp(-sp*0.2)*ripple;
   float near = exp(-dot(rel, rel)*0.5);
   float spark = pow(noise(p*6.0 + vec2(uTime*1.7, -uTime*1.1)), 5.0)*5.0;
-  return vec3(0.95, 0.76, 0.48)*(g*(0.25 + spark) + inside*0.06 + near*0.35)*lead*uTrail;
+  return vec3(0.95, 0.76, 0.48)*(g*(0.3 + spark*0.7) + inside*0.08 + near*0.35)*lead*uTrail;
 }
 
 vec4 clouds(vec3 ro, vec3 rd, float tmax, out vec3 acc){

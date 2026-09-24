@@ -248,6 +248,8 @@ input[type=range] { accent-color: var(--madder); }
 #intro.ready .enter { display: inline-block; }
 #intro.ready .bar { opacity: 0; }
 #intro .fine { margin-top: 22px; font-family: var(--sans); font-size: 11px; color: #7f7159; letter-spacing: 0.05em; }
+#intro .film { display: inline-block; margin-top: 16px; font-size: 15px; color: #c9a86a; text-decoration: none; border-bottom: 1px solid rgba(201,168,106,0.35); }
+#intro .film:hover { color: #fff3da; border-color: #c9a86a; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
