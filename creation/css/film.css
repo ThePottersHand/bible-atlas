@@ -1,0 +1,96 @@
+/* ------------------------------------------------------------------
+   In the Beginning — a dark theatre around a 2.4:1 frame.
+   Type follows the atlas: Cinzel for titles, Cormorant for Scripture.
+   ------------------------------------------------------------------ */
+@font-face { font-family: 'Cinzel'; src: url(../fonts/cinzel.woff2) format('woff2'); font-weight: 400 600; font-display: block; }
+@font-face { font-family: 'Cormorant Garamond'; src: url(../fonts/cormorant.woff2) format('woff2'); font-weight: 400 600; font-style: normal; font-display: block; }
+@font-face { font-family: 'Cormorant Garamond'; src: url(../fonts/cormorant-italic.woff2) format('woff2'); font-weight: 400 500; font-style: italic; font-display: block; }
+
+:root {
+  --ink: #f5ecda;
+  --gold: #e3c688;
+  --dim: rgba(245, 236, 218, 0.62);
+  --display: 'Cinzel', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --serif: 'Cormorant Garamond', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #050403; color: var(--ink); font-family: var(--serif); }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: var(--gold); }
+
+#stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+#frame { position: relative; overflow: hidden; background: #000; --u: 1px; }
+#film { display: block; width: 100%; height: 100%; }
+
+/* ---------- Scripture ---------- */
+#words { position: absolute; inset: 0; pointer-events: none; }
+.cue { position: absolute; left: 6%; right: 6%; text-align: center; }
+.cue.pos-c { top: 50%; transform: translateY(-50%); }
+.cue.pos-l { bottom: 12%; }
+.cue.pos-u { top: 12%; }
+.ln { color: var(--ink); will-change: opacity, filter, transform;
+  text-shadow: 0 0 calc(var(--u) * 22) rgba(8, 5, 2, 0.55), 0 0 calc(var(--u) * 3) rgba(8, 5, 2, 0.35); }
+.s-verse { font-size: calc(var(--u) * 44); line-height: 1.28; font-weight: 400; --track: 0.015em; }
+.s-small { font-size: calc(var(--u) * 31); font-style: italic; line-height: 1.3; color: rgba(245, 236, 218, 0.9); --track: 0.01em; }
+.s-said { font-size: calc(var(--u) * 30); font-style: italic; color: rgba(245, 236, 218, 0.82); margin-bottom: calc(var(--u) * 8); --track: 0.02em; }
+.s-fiat { font-size: calc(var(--u) * 52); font-style: italic; font-weight: 500; line-height: 1.22; --track: 0.005em; }
+.s-day { font-family: var(--display); font-size: calc(var(--u) * 17); letter-spacing: 0.55em; text-transform: uppercase; color: var(--gold); --track: 0.55em;
+  display: inline-flex; align-items: center; gap: calc(var(--u) * 22); }
+.s-day::before, .s-day::after { content: ''; width: calc(var(--u) * 54); height: 1px; background: linear-gradient(90deg, transparent, rgba(227, 198, 136, 0.8), transparent); }
+.cue.pos-l .s-day { display: flex; justify-content: center; }
+.s-john { font-size: calc(var(--u) * 50); line-height: 1.25; color: #fff4de; --track: 0.02em; }
+.s-title { font-family: var(--display); font-size: calc(var(--u) * 62); font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: #fff2d6; --track: 0.3em; margin-right: -0.3em; }
+.s-sub { font-size: calc(var(--u) * 26); font-style: italic; color: var(--gold); margin-top: calc(var(--u) * 14); --track: 0.12em; }
+
+/* ---------- title and end screens ---------- */
+#title-screen, #end-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px 16px;
+  background: radial-gradient(ellipse at 50% 55%, rgba(5, 4, 3, 0.35), rgba(5, 4, 3, 0.86) 70%); transition: opacity 1.2s; z-index: 10; }
+.inner { max-width: 640px; }
+.kicker { font-family: var(--display); font-size: 12px; letter-spacing: 0.42em; text-transform: uppercase; color: var(--gold); opacity: 0.9; }
+#title-screen h1 { font-family: var(--display); font-weight: 500; font-size: clamp(34px, 7vw, 64px); letter-spacing: 0.22em; margin: 18px 0 10px; margin-right: -0.22em; text-transform: uppercase;
+  text-shadow: 0 0 40px rgba(255, 220, 160, 0.25); }
+.verse { font-style: italic; font-size: clamp(18px, 2.6vw, 22px); color: var(--dim); margin: 0 0 30px; }
+.begin { display: inline-flex; align-items: center; gap: 14px; padding: 13px 30px 13px 26px; border-radius: 40px; border: 1px solid rgba(227, 198, 136, 0.55);
+  background: rgba(20, 14, 8, 0.55); font-family: var(--display); font-size: 15px; letter-spacing: 0.3em; text-transform: uppercase; color: #fff2d6;
+  transition: background .2s, border-color .2s, transform .2s; }
+.begin:hover, .begin:focus-visible { background: rgba(60, 40, 18, 0.7); border-color: var(--gold); transform: translateY(-1px); outline: none; }
+.begin .tri { width: 0; height: 0; border-left: 11px solid var(--gold); border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+.fine { font-size: 13px; color: rgba(245, 236, 218, 0.5); margin-top: 22px; line-height: 1.5; }
+.fine kbd { font-family: var(--serif); border: 1px solid rgba(245, 236, 218, 0.35); border-radius: 4px; padding: 0 5px; }
+.back { position: absolute; left: 18px; bottom: 16px; font-size: 15px; color: rgba(245, 236, 218, 0.55); text-decoration: none; }
+.back:hover { color: var(--gold); }
+#title-screen { opacity: 0; pointer-events: none; }
+body.ready #title-screen { opacity: 1; pointer-events: auto; }
+body.started #title-screen { opacity: 0; pointer-events: none; }
+#end-screen { opacity: 0; pointer-events: none; background: rgba(5, 4, 3, 0.8); }
+body.ended #end-screen { opacity: 1; pointer-events: auto; }
+.links { font-size: 17px; margin: 26px 0 0; }
+.links a { text-decoration: none; border-bottom: 1px solid rgba(227, 198, 136, 0.4); }
+
+#loading { position: fixed; left: 50%; bottom: 18%; width: 160px; height: 1px; margin-left: -80px; background: rgba(245, 236, 218, 0.15); overflow: hidden; }
+#loading span { position: absolute; inset: 0; background: var(--gold); transform-origin: left; animation: load 1.6s ease-in-out infinite; }
+@keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+body.ready #loading { display: none; }
+
+/* ---------- controls: only while playing and the pointer moves ---------- */
+#controls { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 28px; background: rgba(12, 9, 6, 0.6); backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .5s; z-index: 5; }
+body.started.awake #controls, body.paused #controls { opacity: 1; pointer-events: auto; }
+body.ended #controls { opacity: 0; pointer-events: none; }
+#controls button { width: 34px; height: 34px; border-radius: 50%; border: 0; background: transparent; font-size: 17px; color: var(--ink); display: grid; place-items: center; }
+#controls button:hover { background: rgba(245, 236, 218, 0.12); }
+#mute.off { opacity: 0.45; text-decoration: line-through; }
+.i-play { width: 0; height: 0; border-left: 11px solid var(--ink); border-top: 7px solid transparent; border-bottom: 7px solid transparent; display: none; margin-left: 3px; }
+.i-pause { width: 11px; height: 13px; border-left: 3px solid var(--ink); border-right: 3px solid var(--ink); }
+body.paused .i-play { display: block; }
+body.paused .i-pause { display: none; }
+#seek { flex: 1; height: 20px; position: relative; cursor: pointer; }
+#seek::before { content: ''; position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: rgba(245, 236, 218, 0.2); border-radius: 2px; }
+#bar { position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: var(--gold); transform-origin: left; transform: scaleX(0); border-radius: 2px; }
+
+#nogl { display: none; position: fixed; inset: 0; align-items: center; justify-content: center; text-align: center; padding: 24px; font-size: 20px; z-index: 20; background: #050403; }
+body.nogl #nogl { display: flex; }
+
+/* ---------- export: nothing but the frame, letterboxed in 1920x1080 ---------- */
+body.capture #title-screen, body.capture #end-screen, body.capture #controls, body.capture #loading { display: none !important; }
+body.capture #stage { background: #000; }

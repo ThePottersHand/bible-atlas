@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>In the Beginning — the seven days of Genesis 1</title>
+<meta name="description" content="A one-minute film of the days of creation in Genesis 1, drawn and scored in the browser. A companion to The Land Bears Witness.">
+<meta name="theme-color" content="#050403">
+<meta property="og:title" content="In the Beginning">
+<meta property="og:description" content="The seven days of Genesis 1 in one minute: light, the expanse, land and seed, the lights of heaven, the swarms, the image of God, and rest.">
+<meta property="og:image" content="poster.jpg">
+<link rel="stylesheet" href="css/film.css">
+</head>
+<body>
+
+<main id="stage">
+  <div id="frame">
+    <canvas id="film"></canvas>
+    <div id="words" aria-live="off"></div>
+  </div>
+</main>
+
+<section id="title-screen">
+  <div class="inner">
+    <div class="kicker">Genesis 1 · a film in one minute</div>
+    <h1>In the Beginning</h1>
+    <p class="verse">“And God said, ‘Let there be light,’ and there was light.”</p>
+    <button id="begin" class="begin" type="button"><span class="tri"></span>Begin</button>
+    <div class="fine">Best with sound · full screen with <kbd>F</kbd></div>
+  </div>
+  <a class="back" href="../index.html">‹ The Land Bears Witness</a>
+</section>
+
+<div id="loading"><span></span></div>
+
+<nav id="controls" aria-label="Playback">
+  <button id="pp" type="button" title="Play / pause (Space)" aria-label="Play or pause"><span class="i-play"></span><span class="i-pause"></span></button>
+  <button id="restart" type="button" title="From the beginning (R)" aria-label="Restart">↺</button>
+  <div id="seek" title="Seek"><div id="bar"></div></div>
+  <button id="mute" type="button" title="Sound (M)" aria-label="Mute" aria-pressed="false">♪</button>
+  <button id="full" type="button" title="Full screen (F)" aria-label="Full screen">⤢</button>
+</nav>
+
+<section id="end-screen">
+  <div class="inner">
+    <button id="again" class="begin" type="button"><span class="tri"></span>Watch again</button>
+    <p class="links"><a href="../index.html">Enter the atlas: The Land Bears Witness</a> · <a href="in-the-beginning.mp4" download>Download the film</a></p>
+    <p class="fine">Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.</p>
+  </div>
+</section>
+
+<div id="nogl">This film is drawn live with WebGL 2, which this browser does not offer. <a href="in-the-beginning.mp4">Watch the rendered film instead</a>.</div>
+
+<audio id="score" preload="auto" src="audio/score.mp3"></audio>
+
+<script src="js/cues.js"></script>
+<script src="js/util.js"></script>
+<script src="js/gl.js"></script>
+<script src="js/glsl.js"></script>
+<script src="js/post.js"></script>
+<script src="js/text.js"></script>
+<script src="js/scenes/deep.js"></script>
+<script src="js/scenes/rise.js"></script>
+<script src="js/scenes/land.js"></script>
+<script src="js/scenes/hill.js"></script>
+<script src="js/scenes/under.js"></script>
+<script src="js/scenes/sky.js"></script>
+<script src="js/scenes/plains.js"></script>
+<script src="js/scenes/dust.js"></script>
+<script src="js/scenes/eden.js"></script>
+<script src="js/scenes/orbit.js"></script>
+<script src="js/film.js"></script>
+</body>
+</html>
