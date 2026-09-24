@@ -82,8 +82,12 @@ Everything is keyed to film time, so any frame can be drawn exactly: `?capture=1
 pip install numpy scipy
 python tools/creation/score.py                 # tools/cache/score.wav and creation/audio/score.mp3
 node tools/creation/render.js stills 11 28.5 48 --w 960
-node tools/creation/render.js film --fps 30    # creation/in-the-beginning.mp4 (about an hour without a GPU)
+node tools/creation/render.js frames           # 2160 PNGs in tools/cache/frames, resumable (about an hour without a GPU)
+ffmpeg -framerate 30 -i tools/cache/frames/f%05d.png -i tools/cache/score.wav -c:v libx264 -preset slow -crf 25 \
+  -maxrate 4500k -bufsize 9000k -tune film -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -shortest creation/in-the-beginning.mp4
 ```
+
+`render.js film` does both steps in one pass when the machine can keep an encoder fed.
 
 ## Deep links
 

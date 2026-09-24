@@ -139,7 +139,7 @@ FILM.scenes = FILM.scenes || {};
 
   /* ---------- live playback ---------- */
   var audio = document.getElementById('score');
-  var playing = false, tNow = 0, anchorT = 0, anchorPerf = 0, raf = 0, frameTimes = [];
+  var playing = false, tNow = 0, anchorT = 0, anchorPerf = 0, raf = 0, frameTimes = [], lastFrame = 0;
 
   function clock() {
     if (!playing) return tNow;
@@ -151,20 +151,20 @@ FILM.scenes = FILM.scenes || {};
     }
     return t;
   }
-  function loop() {
-    var t0 = performance.now();
+  function loop(now) {
     tNow = clock();
     if (tNow >= CUES.duration) { tNow = CUES.duration; renderAt(tNow - 1e-3); finish(); return; }
     renderAt(tNow);
     updateBar();
-    // adaptive resolution: keep the frame under ~20 ms
-    frameTimes.push(performance.now() - t0);
-    if (frameTimes.length > 20) {
+    // adaptive resolution from the real frame interval (the GPU's time shows up here, not in JS)
+    if (lastFrame) frameTimes.push(now - lastFrame);
+    lastFrame = now;
+    if (frameTimes.length > 24) {
       frameTimes.sort(function (a, b) { return a - b; });
-      var med = frameTimes[10];
+      var med = frameTimes[12];
       frameTimes = [];
       if (med > 24 && scale > 0.5) setScale(Math.max(0.5, scale * 0.85));
-      else if (med < 12 && scale < 1) setScale(Math.min(1, scale * 1.1));
+      else if (med < 18 && scale < 1) setScale(Math.min(1, scale * 1.08));
     }
     raf = requestAnimationFrame(loop);
   }
@@ -180,6 +180,8 @@ FILM.scenes = FILM.scenes || {};
       if (p && p.catch) p.catch(function () { });
     }
     cancelAnimationFrame(raf);
+    lastFrame = 0;
+    frameTimes = [];
     raf = requestAnimationFrame(loop);
   }
   function pause() {
@@ -213,6 +215,7 @@ FILM.scenes = FILM.scenes || {};
       this.classList.toggle('off', audio.muted);
       this.setAttribute('aria-pressed', audio.muted ? 'true' : 'false');
     });
+    if (!document.documentElement.requestFullscreen) document.getElementById('full').style.display = 'none';
     document.getElementById('full').addEventListener('click', function () {
       var el = document.documentElement;
       if (document.fullscreenElement) document.exitFullscreen();

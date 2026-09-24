@@ -3,6 +3,7 @@
 
      node tools/creation/render.js stills 0.5 11 23.8 [--w 960] [--out dir]
      node tools/creation/render.js film [--fps 30] [--w 1920] [--from 0] [--to 72] [--out master.mp4] [--web creation/in-the-beginning.mp4]
+     node tools/creation/render.js frames [--out tools/cache/frames]    # PNGs to disk, resumable; encode with ffmpeg after
 
    Needs Playwright (npm i -g playwright, or NODE_PATH pointing at it) and an
    ffmpeg with libx264 on PATH or in FFMPEG. Without a GPU, Chromium falls back
@@ -92,7 +93,12 @@ async function film() {
   const s = await open(width);
   const from = +arg('from', 0), to = +arg('to', s.info.duration);
   const n0 = Math.round(from * fps), n1 = Math.round(to * fps);
-  const withAudio = fs.existsSync(audio) && !process.argv.includes('--silent') ? audio : null;
+  // encode from a snapshot of the score, so re-rendering it mid-export cannot cut the film short
+  let withAudio = null;
+  if (fs.existsSync(audio) && !process.argv.includes('--silent')) {
+    withAudio = path.join(require('os').tmpdir(), 'in-the-beginning-score-' + process.pid + '.wav');
+    fs.copyFileSync(audio, withAudio);
+  }
   // the master, and optionally a lighter copy for the web page, fed from the same frames
   const encs = [encoder(ffmpeg, fps, withAudio, from, to, outFile,
     ['-preset', arg('preset', 'slow'), '-crf', arg('crf', '19'), '-tune', arg('tune', 'film')], ['-b:a', '256k'])];
@@ -113,10 +119,40 @@ async function film() {
   await Promise.all(encs.map((ff) => new Promise((r) => ff.on('close', r))));
   await s.browser.close();
   s.srv.close();
+  if (withAudio) fs.unlinkSync(withAudio);
   console.log('wrote', outFile, webFile || '');
+}
+
+/* frames to disk (resumable: frames already written are skipped), for encoding separately */
+async function frames() {
+  const width = +arg('w', 1920);
+  const fps = +arg('fps', 30);
+  const out = path.resolve(arg('out', path.join(ROOT, 'tools', 'cache', 'frames')));
+  fs.mkdirSync(out, { recursive: true });
+  const s = await open(width);
+  const from = +arg('from', 0), to = +arg('to', s.info.duration);
+  const n0 = Math.round(from * fps), n1 = Math.round(to * fps);
+  const started = Date.now();
+  let made = 0;
+  for (let n = n0; n < n1; n++) {
+    const f = path.join(out, 'f' + String(n).padStart(5, '0') + '.png');
+    if (fs.existsSync(f) && fs.statSync(f).size > 0) continue;
+    await s.page.evaluate((tt) => window.FILM_CAPTURE.frame(tt), n / fps);
+    await s.page.screenshot({ path: f + '.tmp', type: 'png' });
+    fs.renameSync(f + '.tmp', f);
+    made++;
+    if (made % 30 === 1) {
+      const left = (n1 - n) * (Date.now() - started) / made / 1000;
+      console.log(`frame ${n}/${n1}  ~${Math.round(left / 60)} min left`);
+    }
+  }
+  await s.browser.close();
+  s.srv.close();
+  console.log('frames in', out);
 }
 
 const mode = process.argv[2];
 if (mode === 'stills') stills(process.argv.slice(3).filter((a, i, all) => !a.startsWith('--') && !(all[i - 1] || '').startsWith('--')).map(Number));
 else if (mode === 'film') film();
+else if (mode === 'frames') frames();
 else console.log('usage: render.js stills <t...> | film [--fps 30] [--w 1920]');

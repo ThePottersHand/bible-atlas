@@ -15,9 +15,10 @@ uniform sampler2D uA; uniform sampler2D uB; uniform float uK; uniform int uMode;
 void main(){
   vec4 a = texture(uA, vUv), b = texture(uB, vUv);
   vec4 c;
-  if (uMode == 1) {            // through white
-    vec4 w = vec4(6.0, 5.6, 5.0, 1.0);
-    c = uK < 0.5 ? mix(a, w, smoothstep(0.0, 1.0, uK*2.0)) : mix(w, b, smoothstep(0.0, 1.0, uK*2.0 - 1.0));
+  if (uMode == 1) {            // through white: a white the tone curve maps to soft paper, eased at both ends
+    vec4 w = vec4(1.7, 1.62, 1.5, 1.0);
+    float k1 = smoothstep(0.0, 1.0, uK*2.0), k2 = smoothstep(0.0, 1.0, uK*2.0 - 1.0);
+    c = uK < 0.5 ? mix(a, w, k1*k1) : mix(w, b, 1.0 - (1.0 - k2)*(1.0 - k2));
   } else if (uMode == 2) {     // through black
     c = uK < 0.5 ? a*(1.0 - smoothstep(0.0, 1.0, uK*2.0)) : b*smoothstep(0.0, 1.0, uK*2.0 - 1.0);
   } else {

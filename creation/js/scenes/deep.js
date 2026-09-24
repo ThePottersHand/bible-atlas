@@ -13,7 +13,7 @@ FILM.scenes.deep = (function () {
 uniform vec3 uLightDir; uniform float uLightI; uniform vec3 uLightCol;
 uniform float uDay; uniform float uAmb; uniform float uEve;
 uniform vec3 uSpirit; uniform float uSpiritI; uniform vec2 uSpiritDir; uniform float uTrail;
-uniform float uFogBase; uniform float uFogTop; uniform float uFogDens;
+uniform float uFogBase; uniform float uFogTop; uniform float uFogDens; uniform float uFogFade;
 uniform float uWaveAmp;
 
 float wave(vec2 p, vec2 d, float k, float ph, float sharp){
@@ -168,7 +168,9 @@ vec4 clouds(vec3 ro, vec3 rd, float tmax, out vec3 acc){
     }
     t += dt;
   }
-  return vec4(acc, T);
+  // the mist gathers by fading in, not by thickening: a thin slab is already opaque at a grazing angle
+  acc *= uFogFade;
+  return vec4(acc, mix(1.0, T, uFogFade));
 }
 
 void main(){
@@ -243,7 +245,8 @@ void main(){
     s.spiritI = U.sstep(3.6, 4.6, t) * (1 - U.sstep(8.1, 9.3, t));
     s.trail = U.sstep(3.8, 4.8, t) * (1 - U.sstep(8.8, 10.8, t));
     // the waters above: a mist lying on the waters, lifting into a ceiling of cloud
-    s.fogDens = U.sstep(14.9, 15.8, t) * 0.5;
+    s.fogDens = t > 14.8 ? 0.5 : 0;
+    s.fogFade = U.sstep(14.8, 15.9, t);
     var lift = U.ease(U.lstep(16.4, 21.2, t));
     s.fogBase = U.lerp(11, 70, lift);
     s.fogTop = s.fogBase + 60;
@@ -262,7 +265,7 @@ void main(){
       prog.set('uLightDir', s.ldir).set('uLightI', s.lightI).set('uLightCol', [1.0, 0.9, 0.74])
         .set('uDay', s.day).set('uAmb', s.amb).set('uEve', s.eve)
         .set('uSpirit', s.spirit).set('uSpiritI', s.spiritI).set('uSpiritDir', s.spiritDir).set('uTrail', s.trail)
-        .set('uFogBase', s.fogBase).set('uFogTop', s.fogTop).set('uFogDens', s.fogDens).set('uWaveAmp', s.wave);
+        .set('uFogBase', s.fogBase).set('uFogTop', s.fogTop).set('uFogDens', s.fogDens).set('uFogFade', s.fogFade).set('uWaveAmp', s.wave);
       FILM.GL.draw();
     },
     post: function (t) {
