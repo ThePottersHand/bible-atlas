@@ -92,7 +92,7 @@ uniform sampler2D uA; uniform sampler2D uB; uniform sampler2D uC; uniform sample
 void main(){ fragColor = vec4(texture(uA,vUv).rgb*uW.x + texture(uB,vUv).rgb*uW.y + texture(uC,vUv).rgb*uW.z + texture(uD,vUv).rgb*uW.w, 1.0); }`;
 
   var RAYS = H + `
-uniform sampler2D uSrc; uniform vec2 uLight; uniform float uDensity; uniform float uDecay; uniform float uAspect;
+uniform sampler2D uSrc; uniform vec2 uLight; uniform float uDensity; uniform float uDecay;
 void main(){
   vec2 uv = vUv;
   vec2 d = (uv - uLight)*uDensity/48.0;
@@ -251,7 +251,7 @@ void main(){
       G.draw();
       G.bind(T.rays);
       P.rays.use().set('uSrc', T.rsrc).set('uLight', o.light || [0.5, 0.5]).set('uDensity', o.raysDensity || 0.9)
-        .set('uDecay', o.raysDecay || 0.97).set('uAspect', W / Hh);
+        .set('uDecay', o.raysDecay || 0.97);
       G.draw();
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

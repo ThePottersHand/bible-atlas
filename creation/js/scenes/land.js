@@ -21,7 +21,7 @@ uniform vec3 uSunDir; uniform float uSunDisk; uniform float uGlory; uniform floa
 uniform vec3 uMoonDir; uniform float uMoon;
 uniform vec3 uVenusDir; uniform float uVenus;
 uniform mat3 uSkyRot; uniform float uStars; uniform vec3 uMwN; uniform vec3 uMwC;
-uniform float uGreen; uniform float uLush; uniform float uWet; uniform float uFigures; uniform float uSeaOpen;
+uniform float uGreen; uniform float uLush; uniform float uWet; uniform float uFigures;
 uniform float uClouds;
 
 float hMain(float x){ return 6.5*exp(-pow((x - 8.0)/24.0, 2.0)) + 1.2*sin(x*0.07 + 1.0) + 0.5*sin(x*0.19 + 2.0) - 1.4; }

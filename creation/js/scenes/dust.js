@@ -154,7 +154,7 @@ void main(){
 layout(location=0) in vec4 aA;      // kind, bone, u, theta
 layout(location=1) in vec4 aB;      // radius frac, seed, start x, start z
 uniform mat4 uVP; uniform vec3 uJ[21]; uniform vec4 uBone[19]; uniform vec4 uBoneR[19];
-uniform float uTime; uniform float uGather; uniform float uBreath; uniform float uRise;
+uniform float uTime; uniform float uGather; uniform float uBreath;
 uniform vec3 uCamPos; uniform float uFocus; uniform float uPx; uniform vec3 uLight; uniform vec3 uChest;
 out vec3 vCol; out float vAlpha;
 float h(float x){ return fract(sin(x*127.1)*43758.5453); }
@@ -288,7 +288,7 @@ void main(){
       gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ZERO, gl.ONE);
       pProg.use().setAll({
         uVP: U.viewProj(s.cam, sz[0] / sz[1], 0.05, 100), uJ: s.joints, uBone: boneU, uBoneR: boneR,
-        uTime: t, uGather: s.gather, uBreath: s.breath, uRise: 0, uCamPos: s.cam.pos,
+        uTime: t, uGather: s.gather, uBreath: s.breath, uCamPos: s.cam.pos,
         uFocus: Math.hypot(s.cam.pos[0], s.cam.pos[2] + 0.2), uPx: sz[1] / s.cam.fov * 0.5, uLight: LIGHT, uChest: s.chest
       });
       gl.bindVertexArray(vao);

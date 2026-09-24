@@ -317,7 +317,7 @@ def bell(f, t0, amp, kind='celesta', pan=0.0, bus=None, rng=RNG):
         if fr > 16000:
             continue
         y += a * np.sin(2 * math.pi * fr * t + rng.uniform(0, 6.28)) * np.exp(-t / d)
-    y *= np.minimum(1, t / 0.003)
+    y *= np.minimum(1, t / (0.003 if kind == 'toll' else 0.006)) ** 1.5
     if kind == 'toll':
         y += 0.2 * lp(noise(n, rng), 3000) * np.exp(-t / 0.02)
     bus.add(y * amp * 0.35, t0, pan)
@@ -415,6 +415,15 @@ def word(t0, inst, octave=4, step=0.5, amp=0.5, hold=1.0, pan=0.0, extra=None):
     elif inst == 'harp':
         for nm, s, l in notes:
             harp(hz(nm), t0 + s, amp, pan)
+
+
+def shimmer(t0, dur, freqs, amp, rate=14):
+    rng = np.random.default_rng(int(t0 * 10))
+    k = int(dur * rate)
+    for i in range(k):
+        x = i / max(1, k - 1)
+        bell(freqs[rng.integers(len(freqs))], t0 + i / rate + rng.uniform(0, 0.03), amp * (1 - 0.7 * x) * rng.uniform(0.5, 1.0),
+             'celesta', rng.uniform(-0.9, 0.9))
 
 
 def chime(t0, amp=0.35):
@@ -645,7 +654,7 @@ def score():
     say = WORDS
 
     # ---------------- In the beginning: darkness over the deep
-    drone(hz('D1'), 0.0, 10.4, 0.34, a=3.5, r=1.2)
+    drone(hz('D1'), 0.0, 10.4, 0.2, a=3.5, r=1.2)
     drone(hz('A1'), 1.0, 4.2, 0.14, a=2.0, r=1.2)
     ocean(0.2, 11.5, 0.11, deep=0.85, seed=1)
     strings(chord('D2 A2'), 0.8, 4.8, 0.12, attack=2.5, release=1.5, bright=900)
@@ -677,7 +686,7 @@ def score():
 
     # ---------------- "Let there be light" (11.0)
     L = H['light']
-    boom(L, 1.0)
+    boom(L, 0.7)
     timpani(hz('D2'), L, 1.0)
     crash(L, 1.1)
     strings(chord('D2 A2 D3 F#3 A3 D4 F#4 A4 D5 F#5'), L, 2.2, 0.6, attack=0.04, release=0.5, bright=5200)
@@ -686,6 +695,8 @@ def score():
     horn_line([('F#5', 0, 1.6)], L, 0.35, bright=0.9, pan=0.1, release=0.6)
     for i, nm in enumerate(['D6', 'F#6', 'A6', 'D7', 'A6', 'F#6']):
         bell(hz(nm), L + 0.05 + i * 0.09, 0.3, 'glock', -0.5 + i * 0.2)
+    strings(chord('A5 D6 F#6'), L, 2.0, 0.22, attack=0.05, release=0.8, bright=9000, voices=6)
+    shimmer(L + 0.1, 3.2, chord('D6 F#6 A6 D7'), 0.05)
     for i, nm in enumerate(['D5', 'A4', 'F#4', 'D4', 'A3', 'F#3', 'D3']):
         harp(hz(nm), 12.2 + i * 0.12, 0.35, 0.3 - i * 0.1)
     ocean(11.0, 10.5, 0.14, deep=0.1, seed=2)
@@ -726,7 +737,7 @@ def score():
     # ---------------- Day three: dry land
     T3 = H['landrise']
     word(say[2], 'horn', 2, step=0.4, amp=0.55, hold=0.6)
-    boom(T3, 0.8, f0=55, f1=28)
+    boom(T3, 0.55, f0=55, f1=30)
     rumble(T3 - 0.1, 3.4, 0.55)
     cascade(T3 + 0.8, 2.8, 0.12)
     timp_roll(hz('D2'), T3, 1.5, 0.15, 0.5, rate=14)
@@ -865,7 +876,7 @@ def score():
     swell(H['alive'], 0.9, 0.7)
     A6 = H['alive']
     timpani(hz('D2'), A6, 0.9)
-    boom(A6, 0.6, f0=58, f1=34)
+    boom(A6, 0.45, f0=58, f1=34)
     crash(A6, 0.8)
     rise = [(A6, 'D2 A2 D3 F#3 A3 D4 F#4 A4'), (49.0, 'G1 D2 G2 B2 D3 G3 B3 D4'), (49.6, 'A1 E2 A2 C#3 E3 A3 C#4 E4'),
             (50.4, 'D2 A2 D3 F#3 A3 D4 F#4 A4 D5')]
@@ -874,6 +885,7 @@ def score():
         strings(chord(s), t0, d, 0.5, attack=0.08, release=0.5, bright=4400)
         choir(chord(s)[2:], t0, d, 0.5, 'a', attack=0.1, release=0.5)
         brass(chord(s)[2:5], t0, d, 0.3, 0.8)
+    strings(chord('A5 D6 F#6'), A6, 2.8, 0.16, attack=0.3, release=0.8, bright=9000, voices=6)
     # the Word, rising all the way as he stands
     horn_line([('A4', 0, 0.5), ('D5', 0.5, 0.5), ('E5', 1.0, 0.5), ('F#5', 1.5, 0.6), ('A5', 2.1, 1.1)], A6, 0.42, bright=0.9, pan=0.1)
     voice_line([('A4', 0, 0.5), ('D5', 0.5, 0.5), ('E5', 1.0, 0.5), ('F#5', 1.5, 0.6), ('A5', 2.1, 1.1)], A6, 0.35, pan=-0.1)
@@ -915,7 +927,7 @@ def score():
     # ---------------- In the beginning was the Word
     Wd = H['word']
     bell(hz('A6'), Wd, 0.25, 'celesta', 0.0)
-    sine_tone(hz('A5'), Wd, 0.6, 0.05, 0.0, a=0.005, r=1.4)
+    sine_tone(hz('A5'), Wd, 0.6, 0.05, 0.0, a=0.03, r=1.4)
     drone(hz('D2'), 61.0, 4.8, 0.06, a=2.0, r=0.5)
     drone(hz('A2'), 61.5, 4.3, 0.03, a=2.0, r=0.5)
     voice_line([('A4', 0, 0.6), ('D5', 0.6, 0.6), ('E5', 1.2, 2.1)], say[8], 1.2, pan=0.0)
@@ -933,7 +945,7 @@ def score():
     timp_roll(hz('D2'), 64.5, 1.1, 0.08, 0.55, rate=16)
     swell(H['sunrise'], 2.2, 0.9)
     S = H['sunrise']
-    boom(S, 0.8, f0=60, f1=30, dur=4.5)
+    boom(S, 0.55, f0=60, f1=32, dur=4.5)
     timpani(hz('D2'), S, 0.9)
     crash(S, 0.9, dur=6)
     strings(chord('D2 G2 D3 G3 B3 D4 G4 B4 D5'), S, H['amen'] - S, 0.55, attack=0.06, release=0.2, bright=4600)
@@ -944,9 +956,11 @@ def score():
     strings(chord('D2 A2 D3 F#3 A3 D4 F#4 A4 D5 F#5'), Am, 71.2 - Am, 0.55, attack=0.12, release=1.6, bright=4400)
     choir(chord('A2 D3 F#3 A3 D4 F#4 A4 D5'), Am, 71.2 - Am, 0.55, 'a', attack=0.15, release=1.6)
     brass([hz('D3'), hz('A3'), hz('D4'), hz('F#4')], Am, 71.0 - Am, 0.36, 0.7, rel=1.4)
-    drone(hz('D1'), Am, 71.2 - Am, 0.18, a=0.4, r=1.8)
+    drone(hz('D1'), Am, 71.2 - Am, 0.1, a=0.4, r=1.8)
     for i, nm in enumerate(['D6', 'F#6', 'A6', 'D7']):
         bell(hz(nm), Am + 0.08 * i, 0.22, 'glock', -0.3 + 0.2 * i)
+    strings(chord('A5 D6 F#6'), Am, 71.0 - Am, 0.2, attack=0.2, release=1.6, bright=9000, voices=6)
+    shimmer(S + 0.05, 71.0 - S, chord('D6 F#6 A6 D7 G6 B6'), 0.04)
     bell(hz('D6'), 69.0, 0.2, 'celesta', 0.1)
     bell(hz('A5'), 70.3, 0.16, 'celesta', -0.1)
     whoosh(62.4, 3.4, 0.08, lo=80, hi=900, up=True)
@@ -995,20 +1009,6 @@ def convolve(x, ir):
     return np.vstack([signal.fftconvolve(x[0], ir[0])[:x.shape[1]], signal.fftconvolve(x[1], ir[1])[:x.shape[1]]])
 
 
-def compress(x, thresh_db=-20.0, ratio=2.2, attack=0.02, release=0.25):
-    lvl = np.sqrt(signal.lfilter([1 - math.exp(-1 / (0.01 * SR))], [1, -math.exp(-1 / (0.01 * SR))], np.mean(x ** 2, axis=0)) + 1e-12)
-    db = 20 * np.log10(lvl + 1e-12)
-    gr = np.minimum(0, (thresh_db - db) * (1 - 1 / ratio))
-    # asymmetric smoothing: faster attack than release
-    g = np.empty_like(gr)
-    a_c, r_c = math.exp(-1 / (attack * SR)), math.exp(-1 / (release * SR))
-    # vectorised approximation: smooth with the release, then take the min with an attack-smoothed version
-    ga = signal.lfilter([1 - a_c], [1, -a_c], gr)
-    gr_ = signal.lfilter([1 - r_c], [1, -r_c], gr)
-    g = np.minimum(ga, gr_)
-    return x * 10 ** (g / 20)
-
-
 def limit(x, ceiling_db=-1.2, look=0.004, release=0.12):
     """Look-ahead peak limiter: the gain dips before a peak arrives and recovers over `release`."""
     from scipy.ndimage import maximum_filter1d, uniform_filter1d
@@ -1051,9 +1051,9 @@ def master():
     und = lp(under, 700, 2)
     wet_u = convolve(und, deep)
     mix = music * 0.78 + wet_m * 0.34 + sfx * 0.9 + wet_s * 0.2 + und * 0.6 + wet_u * 0.36
-    mix = hp(mix, 28, 2)
-    # a gentle high shelf, so nothing synthetic bites
-    mix = mix - 0.25 * hp(mix, 7500, 1)
+    mix = hp(mix, 34, 2)
+    # a little presence, since the orchestra is weighted low
+    mix = mix + 0.22 * hp(mix, 1200, 1) - 0.12 * hp(mix, 9000, 1)
     mix = mix[:, :n]
     # end: breathe out to silence by the last frame
     t = tvec(n)

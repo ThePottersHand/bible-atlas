@@ -41,7 +41,6 @@ float luma(vec3 c){ return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 mat2 rot2(float a){ float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
 
 uint hashu(uint x){ x ^= x >> 16; x *= 0x7feb352du; x ^= x >> 15; x *= 0x846ca68bu; x ^= x >> 16; return x; }
-float hash11(float p){ return float(hashu(floatBitsToUint(p))) / 4294967295.0; }
 float hash21(vec2 p){ uvec2 q = uvec2(ivec2(floor(p))); return float(hashu(q.x ^ hashu(q.y + 0x9e3779b9u))) / 4294967295.0; }
 vec2 hash22(vec2 p){ uvec2 q = uvec2(ivec2(floor(p))); uint h = hashu(q.x ^ hashu(q.y + 0x9e3779b9u));
   return vec2(float(h & 0xffffu), float(h >> 16)) / 65535.0; }
@@ -52,11 +51,6 @@ float noise(vec2 p){
   vec2 i = floor(p), f = fract(p);
   f = f*f*(3.0-2.0*f);
   return textureLod(uNoise, (i + f + 0.5)/256.0, 0.0).x;
-}
-vec4 noise4(vec2 p){
-  vec2 i = floor(p), f = fract(p);
-  f = f*f*(3.0-2.0*f);
-  return textureLod(uNoise, (i + f + 0.5)/256.0, 0.0);
 }
 // Smooth 3D value noise (64^3 random volume).
 float noise3(vec3 p){
@@ -88,16 +82,6 @@ vec3 camRay(vec2 fc){
   vec2 p = (2.0*fc - uRes)/uRes.y;
   return normalize(uCamRot*vec3(p*uFov, -1.0));
 }
-// Screen position (0..1) of a world direction, z<0 means behind the camera.
-vec3 dirToScreen(vec3 d){
-  vec3 c = transpose(uCamRot)*d;
-  if (c.z >= 0.0) return vec3(0.5, 0.5, -1.0);
-  vec2 p = c.xy/(-c.z)/uFov;
-  return vec3(p.x*uRes.y/uRes.x*0.5 + 0.5, p.y*0.5 + 0.5, 1.0);
-}
-
-// Soft glow around a direction, shaped like a lens halo.
-float glow(vec3 rd, vec3 dir, float sharp){ return pow(max(dot(rd, dir), 0.0), sharp); }
 `;
 
   return { header: header, geomHeader: geomHeader, common: common };
